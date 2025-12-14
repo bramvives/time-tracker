@@ -36,3 +36,50 @@ class Database:
             """)
             
             conn.commit()
+    
+    def create_project(self, name: str) -> bool:
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute("INSERT INTO projects (name) VALUES (?)", (name,))
+                return True
+        except sqlite3.IntegrityError:
+            return False
+    
+    def get_project_by_id(self, project_id: int) -> tuple:
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute(
+                "SELECT id, name, created_at FROM projects WHERE id = ?", 
+                (project_id,)
+            )
+            return cursor.fetchone()
+    
+    def get_project_by_name(self, name: str) -> tuple:
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute(
+                "SELECT id, name, created_at FROM projects WHERE name = ?", 
+                (name,)
+            )
+            return cursor.fetchone()
+    
+    def get_all_projects(self) -> list:
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute(
+                "SELECT id, name, created_at FROM projects ORDER BY name"
+            )
+            return cursor.fetchall()
+    
+    def update_project(self, project_id: int, new_name: str) -> bool:
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.execute(
+                    "UPDATE projects SET name = ? WHERE id = ?", 
+                    (new_name, project_id)
+                )
+                return cursor.rowcount > 0
+        except sqlite3.IntegrityError:
+            return False
+    
+    def delete_project(self, project_id: int) -> bool:
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute("DELETE FROM projects WHERE id = ?", (project_id,))
+            return cursor.rowcount > 0
