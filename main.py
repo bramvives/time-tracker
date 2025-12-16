@@ -2,6 +2,7 @@ import click
 from config import Config
 from database import Database
 from commands.project import project
+from commands.time_entry import time
 
 
 @click.group()
@@ -13,6 +14,7 @@ def cli(ctx):
 
 
 cli.add_command(project)  # type: ignore
+cli.add_command(time)  # type: ignore
 
 if __name__ == "__main__":
     cli()
