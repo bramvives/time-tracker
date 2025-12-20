@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import csv
 
 
 class Database:
@@ -170,3 +171,36 @@ class Database:
             )
             result = cursor.fetchone()
             return result[0] if result[0] is not None else 0
+    
+    def export_to_csv(self, filename: str, project_id: int = None) -> bool:
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                if project_id:
+                    cursor = conn.execute(
+                        """SELECT te.id, p.name as project_name, te.duration_minutes, 
+                           te.description, te.entry_date, te.created_at 
+                           FROM time_entries te 
+                           JOIN projects p ON te.project_id = p.id 
+                           WHERE te.project_id = ?
+                           ORDER BY te.entry_date DESC""",
+                        (project_id,)
+                    )
+                else:
+                    cursor = conn.execute(
+                        """SELECT te.id, p.name as project_name, te.duration_minutes, 
+                           te.description, te.entry_date, te.created_at 
+                           FROM time_entries te 
+                           JOIN projects p ON te.project_id = p.id 
+                           ORDER BY te.entry_date DESC"""
+                    )
+                
+                data = cursor.fetchall()
+                
+                with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
+                    writer = csv.writer(csvfile)
+                    writer.writerow(['ID', 'Project', 'Duration (minutes)', 'Description', 'Date', 'Created At'])
+                    writer.writerows(data)
+                
+                return True
+        except Exception:
+            return False

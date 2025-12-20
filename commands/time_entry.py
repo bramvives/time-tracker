@@ -206,3 +206,34 @@ def time_summary(ctx, project_id):
         grand_hours = grand_total // 60
         grand_minutes = grand_total % 60
         click.echo(f"\nGrand total: {grand_hours}h {grand_minutes}m ({grand_total} minutes)")
+
+
+@time.command("export")
+@click.argument("filename", required=False)
+@click.option("--project-id", type=int, help="Export only entries for specific project")
+@click.pass_context
+def time_export(ctx, filename, project_id):
+    """Export time entries to CSV file"""
+    db = ctx.obj['db']
+    
+    if not filename:
+        filename = click.prompt("CSV filename")
+    
+    if not filename.endswith('.csv'):
+        filename += '.csv'
+    
+    if project_id:
+        project = db.get_project_by_id(project_id)
+        if not project:
+            click.echo(f"Project {project_id} not found.")
+            return
+        
+        if db.export_to_csv(filename, project_id):
+            click.echo(f"Time entries for project '{project[1]}' exported to {filename}")
+        else:
+            click.echo("Failed to export CSV file.")
+    else:
+        if db.export_to_csv(filename):
+            click.echo(f"All time entries exported to {filename}")
+        else:
+            click.echo("Failed to export CSV file.")
