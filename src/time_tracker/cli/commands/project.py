@@ -46,7 +46,6 @@ def project_update(ctx, project_id, new_name):
     db = ctx.obj['db']
     
     if not project_id:
-        # Show available projects
         projects = db.get_all_projects()
         if not projects:
             click.echo("No projects found.")
@@ -59,7 +58,6 @@ def project_update(ctx, project_id, new_name):
         project_id = click.prompt("Project ID to update", type=int)
     
     if not new_name:
-        # Show current project name
         current_project = db.get_project_by_id(project_id)
         if not current_project:
             click.echo(f"Project {project_id} not found.")
@@ -82,7 +80,6 @@ def project_delete(ctx, project_id):
     db = ctx.obj['db']
     
     if not project_id:
-        # Show available projects
         projects = db.get_all_projects()
         if not projects:
             click.echo("No projects found.")
@@ -94,7 +91,6 @@ def project_delete(ctx, project_id):
         
         project_id = click.prompt("Project ID to delete", type=int)
     
-    # Show project name before deletion
     current_project = db.get_project_by_id(project_id)
     if not current_project:
         click.echo(f"Project {project_id} not found.")

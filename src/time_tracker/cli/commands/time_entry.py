@@ -19,7 +19,6 @@ def time_add(ctx, project_id, duration, description, date):
     db = ctx.obj['db']
     
     if not project_id:
-        # Show available projects
         projects = db.get_all_projects()
         if not projects:
             click.echo("No projects found. Create a project first.")
@@ -31,7 +30,6 @@ def time_add(ctx, project_id, duration, description, date):
         
         project_id = click.prompt("Project ID", type=int)
     
-    # Verify project exists
     project = db.get_project_by_id(project_id)
     if not project:
         click.echo(f"Project {project_id} not found.")
@@ -74,11 +72,9 @@ def time_list(ctx, project_id):
     total_minutes = 0
     for entry in entries:
         if project_id:
-            # Entry format: id, project_id, duration_minutes, description, entry_date, created_at
             click.echo(f"  {entry[0]}: {entry[2]} min - {entry[3]} ({entry[4]})")
             total_minutes += entry[2]
         else:
-            # Entry format: id, project_id, project_name, duration_minutes, description, entry_date, created_at
             click.echo(f"  {entry[0]}: [{entry[2]}] {entry[3]} min - {entry[4]} ({entry[5]})")
             total_minutes += entry[3]
     
@@ -98,7 +94,6 @@ def time_update(ctx, entry_id, duration, description, date):
     db = ctx.obj['db']
     
     if not entry_id:
-        # Show available entries
         entries = db.get_all_time_entries()
         if not entries:
             click.echo("No time entries found.")
@@ -110,7 +105,6 @@ def time_update(ctx, entry_id, duration, description, date):
         
         entry_id = click.prompt("Entry ID to update", type=int)
     
-    # Verify entry exists
     entry = db.get_time_entry_by_id(entry_id)
     if not entry:
         click.echo(f"Time entry {entry_id} not found.")
@@ -118,7 +112,6 @@ def time_update(ctx, entry_id, duration, description, date):
     
     click.echo(f"Current entry: {entry[2]} min - {entry[3]} ({entry[4]})")
     
-    # Prompt for values if not provided
     if duration is None:
         duration = click.prompt("New duration in minutes", type=int, default=entry[2])
     
@@ -142,7 +135,6 @@ def time_delete(ctx, entry_id):
     db = ctx.obj['db']
     
     if not entry_id:
-        # Show available entries
         entries = db.get_all_time_entries()
         if not entries:
             click.echo("No time entries found.")
@@ -154,7 +146,6 @@ def time_delete(ctx, entry_id):
         
         entry_id = click.prompt("Entry ID to delete", type=int)
     
-    # Show entry details before deletion
     entry = db.get_time_entry_by_id(entry_id)
     if not entry:
         click.echo(f"Time entry {entry_id} not found.")
